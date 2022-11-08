@@ -22,16 +22,16 @@ export const server = createServer(app);
  * @return {express.Response.body}
  */
 app.get("/", async (req: Request, res: Response) => {
-    res.status(200).send("Welcome to API!");
+	res.status(200).send("Welcome to API!");
 });
 
 connection
-    .then(() => {
-        console.log("DB Connection");
-        server.listen(3000, () => {
-            console.log("Server started at http://localhost: 3000");
-        });
-    })
-    .catch((error) => {
-        throw new Error(error);
-    });
+	.then(() => {
+		console.log("DB Connection");
+		server.listen(3000, () => {
+			console.log("Server started at http://localhost: 3000");
+		});
+	})
+	.catch((error) => {
+		throw new Error(error);
+	});
