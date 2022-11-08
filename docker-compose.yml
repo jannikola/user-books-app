@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    working_dir: /app
+    command: npm run dev
+    volumes:
+      - /app/node_modules
+      - ./api:/app
+      - content:/data
+    env_file: api/.env
+    ports:
+      - 8080:3000
+    networks:
+      - apibeta
+
+  postgres:
+    container_name: article-postgres
+    image: "postgres:11.11-alpine"
+    ports:
+      - 5434:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: articledb
+    networks:
+      - apibeta
+
+  pgadmin:
+    links:
+      - postgres:postgres
+    container_name: article-pgadmin
+    image: dpage/pgadmin4
+    ports:
+      - "8082:80"
+    volumes:
+      - /data/pgadmin:/root/.pgadmin
+    env_file:
+      - docker.env
+    logging:
+      driver: none
+    networks:
+      - apibeta
+
+volumes:
+  postgres:
+  data:
+  content:
+
+networks:
+  apibeta:
+    driver: bridge
