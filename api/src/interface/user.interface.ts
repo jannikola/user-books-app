@@ -18,3 +18,9 @@ export interface IUserCreate {
     firstName: string;
     lastName: string;
 }
+
+export interface IUserEdit {
+    password: string;
+    firstName: string;
+    lastName: string;
+}

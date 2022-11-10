@@ -1,4 +1,4 @@
-import e, { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { JwtToken } from "../utilities/jwt";
 import { UserService } from "../services/user";
 import { ResponseBuilder } from "../utilities/response";
@@ -44,6 +44,30 @@ export const validateCreate = async (
     }
 };
 
+export const validateEdit = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const body = req.body;
+        const user = body.user;
+        delete body.user;
+
+        await Validator.edit(body);
+
+        body.user = user;
+        next();
+    } catch (e) {
+        return new ResponseBuilder<Error>()
+            .setData(e.message)
+            .setStatus(false)
+            .setResponse(res)
+            .setResponseStatus(400)
+            .build();
+    }
+};
+
 export const userExist = async (
     req: Request,
     res: Response,
@@ -68,7 +92,7 @@ export const userExist = async (
     }
 };
 
-export const canAddAllUsers = async (
+export const canAdd = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -83,6 +107,40 @@ export const canAddAllUsers = async (
         if (!permissions.includes(EPermission.ADD_ALL_USERS)) {
             throw new Error("Forbidden");
         }
+
+        next();
+    } catch (e) {
+        return new ResponseBuilder<Error>()
+            .setData(e.message)
+            .setStatus(false)
+            .setResponse(res)
+            .setResponseStatus(403)
+            .build();
+    }
+};
+
+export const canEdit = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const id = Number(req.params.id);
+        const authorization = req.headers.authorization;
+        const requestUser = JwtToken.getRequestUser(authorization);
+
+        const [roleUser, targetUser] = await Promise.all([
+            UserService.getById(requestUser.id),
+            UserService.getById(id),
+        ])
+
+        const permissions = await RolePermissionHelper.getPermissionsArrayForRole(roleUser.role);
+
+        if (!permissions.includes(EPermission.EDIT_ALL_USERS) && requestUser.id !== targetUser.id) {
+            throw new Error("Forbidden");
+        }
+
+        req.body.user = targetUser;
 
         next();
     } catch (e) {

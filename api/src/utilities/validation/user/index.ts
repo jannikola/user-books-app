@@ -19,4 +19,13 @@ export class Validator {
             throw new Error(e.message);
         }
     }
+
+    static async edit(body: IUserCreate) {
+        try {
+            const loginSchema = Schema.edit();
+            return await loginSchema.validateAsync(body);
+        } catch (e) {
+            throw new Error(e.message);
+        }
+    }
 }

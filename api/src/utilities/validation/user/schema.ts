@@ -1,6 +1,4 @@
 import Joi from "joi";
-
-
 export class Schema {
     static login() {
         try {
@@ -20,6 +18,18 @@ export class Schema {
                 password: Joi.string().required(),
                 firstName: Joi.string().required(),
                 lastName: Joi.string().required(),
+            });
+        } catch (e) {
+            throw new Error(e);
+        }
+    }
+
+    static edit() {
+        try {
+            return Joi.object({
+                password: Joi.string(),
+                firstName: Joi.string(),
+                lastName: Joi.string(),
             });
         } catch (e) {
             throw new Error(e);

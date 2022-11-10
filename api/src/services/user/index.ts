@@ -1,5 +1,5 @@
 import { Crypt } from "../../utilities/crypt";
-import { ILogin, IUserCreate } from "../../interface/user.interface";
+import { ILogin, IUserCreate, IUserEdit } from "../../interface/user.interface";
 import { UserRepository } from "../../repositories/user";
 import { JwtToken } from "../../utilities/jwt";
 import { User } from "../../entities/user.model";
@@ -20,6 +20,17 @@ export class UserService {
         Object.assign(newUser, data);
 
         return await this.save(newUser);
+    }
+
+    static async edit(data: IUserEdit, user: User): Promise<User> {
+        if (data.password) {
+            const hashPassword = await Crypt.hash(data.password);
+            data.password = hashPassword;
+        }
+
+        Object.assign(user, data);
+
+        return await this.save(user);
     }
 
     static async getById(id: number): Promise<User> {
