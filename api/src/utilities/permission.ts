@@ -1,5 +1,6 @@
 import { RoleService } from "../services/role";
 import { Role } from "../entities/role.model";
+import { UserService } from "../services/user";
 
 export class RolePermissionHelper {
     static async getPermissionsArrayForRole(data: Role) {
@@ -11,5 +12,17 @@ export class RolePermissionHelper {
         }
 
         return arr;
+    }
+
+    static async getRoleAndTargetUsers(roleUserId: number, targetUserId: number) {
+        const [roleUser, targetUser] = await Promise.all([
+            UserService.getById(roleUserId),
+            UserService.getById(targetUserId),
+        ]);
+
+        return {
+            roleUser,
+            targetUser,
+        }
     }
 }

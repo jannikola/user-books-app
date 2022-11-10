@@ -51,4 +51,17 @@ export class UserRepository {
             throw new Error(e);
         }
     }
+
+    static async deactivateById(id: number) {
+        try {
+            return await this.getRepo()
+                .createQueryBuilder()
+                .update(User)
+                .set({ deactivatedAt: new Date() })
+                .where("id = :id", { id })
+                .execute();
+        } catch (e) {
+            throw new Error(e);
+        }
+    }
 }

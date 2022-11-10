@@ -119,36 +119,36 @@ export const canAdd = async (
     }
 };
 
-export const canEdit = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try {
-        const id = Number(req.params.id);
-        const authorization = req.headers.authorization;
-        const requestUser = JwtToken.getRequestUser(authorization);
+export const can = (permission: EPermission) => {
+    return async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) => {
+        try {
+            const id = Number(req.params.id);
+            const authorization = req.headers.authorization;
+            const requestUser = JwtToken.getRequestUser(authorization);
 
-        const [roleUser, targetUser] = await Promise.all([
-            UserService.getById(requestUser.id),
-            UserService.getById(id),
-        ])
+            const usersToCheck = await RolePermissionHelper.getRoleAndTargetUsers(requestUser.id, id);
+            const { roleUser, targetUser } = usersToCheck;
 
-        const permissions = await RolePermissionHelper.getPermissionsArrayForRole(roleUser.role);
+            const permissions = await RolePermissionHelper.getPermissionsArrayForRole(roleUser.role);
 
-        if (!permissions.includes(EPermission.EDIT_ALL_USERS) && requestUser.id !== targetUser.id) {
-            throw new Error("Forbidden");
+            if (!permissions.includes(permission) && requestUser.id !== targetUser.id) {
+                throw new Error("Forbidden");
+            }
+
+            req.body.user = targetUser;
+
+            next();
+        } catch (e) {
+            return new ResponseBuilder<Error>()
+                .setData(e.message)
+                .setStatus(false)
+                .setResponse(res)
+                .setResponseStatus(403)
+                .build();
         }
-
-        req.body.user = targetUser;
-
-        next();
-    } catch (e) {
-        return new ResponseBuilder<Error>()
-            .setData(e.message)
-            .setStatus(false)
-            .setResponse(res)
-            .setResponseStatus(403)
-            .build();
     }
-};
+}

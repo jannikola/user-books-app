@@ -2,8 +2,8 @@ import { Router, Request, Response } from "express";
 import { UserService } from "../../../services/user";
 import { ResponseBuilder } from "../../../utilities/response";
 import {
+    can,
     canAdd,
-    canEdit,
     userExist,
     validateCreate,
     validateEdit,
@@ -11,6 +11,8 @@ import {
 } from "../../../middleware/user.middleware";
 import { ERole } from "../../../enum/role.enum";
 import { User } from "../../../entities/user.model";
+import { EPermission } from "../../../enum/permission.enum";
+import { UpdateResult } from "typeorm";
 export class UserRoutes {
     private router: Router = Router();
 
@@ -79,7 +81,7 @@ export class UserRoutes {
 
         this.router.put(
             "/user/:id",
-            canEdit,
+            can(EPermission.EDIT_ALL_USERS),
             validateEdit,
             async (req: Request, res: Response) => {
                 try {
@@ -94,6 +96,35 @@ export class UserRoutes {
                     }
 
                     return new ResponseBuilder<User>()
+                        .setData(result)
+                        .setStatus(true)
+                        .setResponse(res)
+                        .setResponseStatus(200)
+                        .build();
+                } catch (e) {
+                    return new ResponseBuilder<Error>()
+                        .setData(e.message)
+                        .setStatus(false)
+                        .setResponse(res)
+                        .setResponseStatus(400)
+                        .build();
+                }
+            }
+        );
+
+        this.router.patch(
+            "/user/deactivate/:id",
+            can(EPermission.DEACTIVATE_ALL_USERS),
+            async (req: Request, res: Response) => {
+                try {
+                    const body = req.body;
+                    const result = await UserService.deactivateById(body.user.id);
+
+                    if (!result) {
+                        throw new Error("Something went wrong!");
+                    }
+
+                    return new ResponseBuilder<UpdateResult>()
                         .setData(result)
                         .setStatus(true)
                         .setResponse(res)

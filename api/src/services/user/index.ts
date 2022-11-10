@@ -68,5 +68,7 @@ export class UserService {
         });
     }
 
-
+    static async deactivateById(id: number) {
+        return await UserRepository.deactivateById(id);
+    }
 }
