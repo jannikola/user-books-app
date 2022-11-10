@@ -33,7 +33,6 @@ export interface IJSONBuilder<T> {
     setResponseStatus(status: number): this;
 }
 
-// tslint:disable
 export class JSONResponse<T> {
     private status: boolean;
     private result?: T;

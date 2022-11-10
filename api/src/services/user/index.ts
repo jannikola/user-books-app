@@ -25,11 +25,9 @@ export class UserService {
             return null;
         }
 
-        const token = await JwtToken.signToken({
+        return JwtToken.signToken({
             id: user.id,
             email: user.email,
         });
-
-        return token;
     }
 }

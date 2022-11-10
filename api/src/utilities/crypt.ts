@@ -9,7 +9,6 @@ export class Crypt {
      */
     static async compare(str: string, hash: string) {
         try {
-            console.log({ str, hash })
             return await bcrypt.compare(str, hash);
         } catch (e) {
             console.error(e);

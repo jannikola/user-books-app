@@ -7,3 +7,7 @@ export interface ILoggedUser {
     id: number;
     email: string;
 }
+export interface IUserLogin {
+    email: string;
+    password: string;
+}
