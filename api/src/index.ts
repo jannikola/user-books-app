@@ -2,6 +2,14 @@ import express, { Request, Response } from "express";
 import * as bodyParser from "body-parser";
 import { createServer } from "http";
 import connection from "./config";
+import * as dotenv from "dotenv";
+import * as routes from "./routes/routes";
+
+const envConf = dotenv.config();
+
+if (envConf.error) {
+	throw envConf.error;
+}
 
 const app = express();
 app.use(bodyParser.json());
@@ -24,6 +32,8 @@ export const server = createServer(app);
 app.get("/", async (req: Request, res: Response) => {
 	res.status(200).send("Welcome to API!");
 });
+
+routes.apiRoutes(app).catch((e) => console.error(e));
 
 connection
 	.then(() => {
