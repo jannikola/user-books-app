@@ -1,5 +1,5 @@
 import { User } from "../../entities/user.model";
-import { getManager } from "typeorm";
+import { getManager, getConnection } from "typeorm";
 
 export class UserRepository {
     static getRepo() {
@@ -58,6 +58,20 @@ export class UserRepository {
                 .createQueryBuilder()
                 .update(User)
                 .set({ deactivatedAt: new Date() })
+                .where("id = :id", { id })
+                .execute();
+
+        } catch (e) {
+            throw new Error(e);
+        }
+    }
+
+    static async deleteById(id: number) {
+        try {
+            return await getConnection()
+                .createQueryBuilder()
+                .delete()
+                .from(User)
                 .where("id = :id", { id })
                 .execute();
         } catch (e) {

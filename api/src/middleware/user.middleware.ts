@@ -5,6 +5,7 @@ import { ResponseBuilder } from "../utilities/response";
 import { Validator } from "../utilities/validation/user";
 import { EPermission } from "../enum/permission.enum";
 import { RolePermissionHelper } from "../utilities/permission";
+import { ERole } from "../enum/role.enum";
 
 export const validateLogin = async (
     req: Request,
@@ -135,7 +136,21 @@ export const can = (permission: EPermission) => {
 
             const permissions = await RolePermissionHelper.getPermissionsArrayForRole(roleUser.role);
 
-            if (!permissions.includes(permission) && requestUser.id !== targetUser.id) {
+            const isSameUser = roleUser.id === targetUser.id;
+
+            if (permission === EPermission.REMOVE_ALL_USERS) {
+                if (isSameUser) {
+                    throw new Error("Forbidden");
+                }
+
+                const isOtherAdminActive = targetUser.role.type === ERole.ADMIN && !targetUser.deactivatedAt;
+
+                if (!isSameUser && isOtherAdminActive) {
+                    throw new Error("Forbidden");
+                }
+            }
+
+            if (!permissions.includes(permission) && !isSameUser) {
                 throw new Error("Forbidden");
             }
 

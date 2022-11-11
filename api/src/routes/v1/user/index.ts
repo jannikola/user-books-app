@@ -12,7 +12,7 @@ import {
 import { ERole } from "../../../enum/role.enum";
 import { User } from "../../../entities/user.model";
 import { EPermission } from "../../../enum/permission.enum";
-import { UpdateResult } from "typeorm";
+import { DeleteResult, UpdateResult } from "typeorm";
 export class UserRoutes {
     private router: Router = Router();
 
@@ -125,6 +125,35 @@ export class UserRoutes {
                     }
 
                     return new ResponseBuilder<UpdateResult>()
+                        .setData(result)
+                        .setStatus(true)
+                        .setResponse(res)
+                        .setResponseStatus(200)
+                        .build();
+                } catch (e) {
+                    return new ResponseBuilder<Error>()
+                        .setData(e.message)
+                        .setStatus(false)
+                        .setResponse(res)
+                        .setResponseStatus(400)
+                        .build();
+                }
+            }
+        );
+
+        this.router.delete(
+            "/user/delete/:id",
+            can(EPermission.REMOVE_ALL_USERS),
+            async (req: Request, res: Response) => {
+                try {
+                    const body = req.body;
+                    const result = await UserService.deleteById(body.user.id);
+
+                    if (!result) {
+                        throw new Error("Something went wrong!");
+                    }
+
+                    return new ResponseBuilder<DeleteResult>()
                         .setData(result)
                         .setStatus(true)
                         .setResponse(res)

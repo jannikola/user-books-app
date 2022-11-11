@@ -59,7 +59,7 @@ export class UserService {
         const passwordMatch = await Crypt.compare(password, user.password);
 
         if (!passwordMatch) {
-            return null;
+            throw new Error("Invalid creds.")
         }
 
         return JwtToken.signToken({
@@ -70,5 +70,9 @@ export class UserService {
 
     static async deactivateById(id: number) {
         return await UserRepository.deactivateById(id);
+    }
+
+    static async deleteById(id: number) {
+        return await UserRepository.deleteById(id);
     }
 }
