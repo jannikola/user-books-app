@@ -58,10 +58,9 @@ export const can = (permission: EPermission) => {
             const authorization = req.headers.authorization;
             const requestUser = JwtToken.getRequestUser(authorization);
 
-            const [roleUser, book, author] = await Promise.all([
+            const [roleUser, book,] = await Promise.all([
                 UserService.getById(requestUser.id),
                 BookService.getById(id),
-                UserService.getById(body.authorId)
             ]);
 
             const permissions = await RolePermissionHelper.getPermissionsArrayForRole(roleUser.role);
@@ -75,12 +74,17 @@ export const can = (permission: EPermission) => {
                     break;
 
                 case EPermission.EDIT_BOOKS:
-                case EPermission.REMOVE_BOOKS:
                     if (!havePermission && book.author.id !== roleUser.id) {
                         throw new Error("Forbidden");
                     }
                     body.book = book;
-                    body.author = author;
+                    body.author = await UserService.getById(body.authorId);
+                    break;
+
+                case EPermission.REMOVE_BOOKS:
+                    if (!havePermission && book.author.id !== roleUser.id) {
+                        throw new Error("Forbidden");
+                    }
                     break;
 
                 default:
