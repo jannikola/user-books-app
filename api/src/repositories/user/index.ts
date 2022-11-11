@@ -60,7 +60,6 @@ export class UserRepository {
                 .set({ deactivatedAt: new Date() })
                 .where("id = :id", { id })
                 .execute();
-
         } catch (e) {
             throw new Error(e);
         }
