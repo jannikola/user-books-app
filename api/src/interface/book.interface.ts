@@ -6,3 +6,9 @@ export interface IBook {
     publisher: string;
     author?: User
 }
+export interface IEditBook {
+    authorId?: number;
+    title?: string;
+    publisher?: string;
+    author?: User
+}

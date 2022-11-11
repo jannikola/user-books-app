@@ -12,4 +12,16 @@ export class Schema {
             throw new Error(e);
         }
     }
+
+    static edit() {
+        try {
+            return Joi.object({
+                authorId: Joi.number(),
+                title: Joi.string(),
+                publisher: Joi.string(),
+            });
+        } catch (e) {
+            throw new Error(e);
+        }
+    }
 }

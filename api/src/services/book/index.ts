@@ -17,4 +17,24 @@ export class BookService {
 
         return await this.save(newBook);
     }
+
+    static async edit(data: IBook, book: Book) {
+        Object.assign(book, data);
+
+        return await this.save(book);
+    }
+
+    static async getById(id: number) {
+        const result = await BookRepository.getById(id);
+
+        if (!result) {
+            throw new Error("Book not found.");
+        }
+
+        return result;
+    }
+
+    static async deleteById(id: number) {
+        return await BookRepository.deleteById(id);
+    }
 }

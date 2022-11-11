@@ -5,6 +5,7 @@ import { JwtToken } from "../utilities/jwt";
 import { ResponseBuilder } from "../utilities/response";
 import { Validator } from "../utilities/validation/book";
 import { UserService } from "../services/user";
+import { BookService } from "../services/book";
 
 
 export const validateCreate = async (
@@ -26,6 +27,25 @@ export const validateCreate = async (
     }
 };
 
+export const validateEdit = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const body = req.body;
+        await Validator.edit(body);
+        next();
+    } catch (e) {
+        return new ResponseBuilder<Error>()
+            .setData(e.message)
+            .setStatus(false)
+            .setResponse(res)
+            .setResponseStatus(400)
+            .build();
+    }
+};
+
 export const can = (permission: EPermission) => {
     return async (
         req: Request,
@@ -33,15 +53,41 @@ export const can = (permission: EPermission) => {
         next: NextFunction
     ) => {
         try {
+            const id = Number(req.params.id);
             const body = req.body;
             const authorization = req.headers.authorization;
             const requestUser = JwtToken.getRequestUser(authorization);
-            const user = await UserService.getById(requestUser.id);
 
-            const permissions = await RolePermissionHelper.getPermissionsArrayForRole(user.role);
+            const [roleUser, book, author] = await Promise.all([
+                UserService.getById(requestUser.id),
+                BookService.getById(id),
+                UserService.getById(body.authorId)
+            ]);
 
-            if (permission === EPermission.ADD_BOOKS && !permissions.includes(permission) && body.authorId) {
-                throw new Error("Forbidden");
+            const permissions = await RolePermissionHelper.getPermissionsArrayForRole(roleUser.role);
+            const havePermission = permissions.includes(permission);
+
+            switch (permission) {
+                case EPermission.ADD_BOOKS:
+                    if (!havePermission && body.authorId) {
+                        throw new Error("Forbidden");
+                    }
+                    break;
+
+                case EPermission.EDIT_BOOKS:
+                case EPermission.REMOVE_BOOKS:
+                    if (!havePermission && book.author.id !== roleUser.id) {
+                        throw new Error("Forbidden");
+                    }
+                    body.book = book;
+                    body.author = author;
+                    break;
+
+                default:
+                    if (!havePermission) {
+                        throw new Error("Forbidden");
+                    }
+                    break;
             }
 
             next();
