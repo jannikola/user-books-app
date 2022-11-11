@@ -13,8 +13,8 @@ export class BookRoutes {
     public getRouter(): Router {
         this.router.post(
             "/book",
-            can(EPermission.ADD_BOOKS),
             validateCreate,
+            can(EPermission.ADD_BOOKS),
             async (req: Request, res: Response) => {
                 try {
                     const body = req.body;
@@ -49,8 +49,8 @@ export class BookRoutes {
 
         this.router.put(
             "/book/:id",
-            can(EPermission.EDIT_BOOKS),
             validateEdit,
+            can(EPermission.EDIT_BOOKS),
             async (req: Request, res: Response) => {
                 try {
                     const body = req.body;

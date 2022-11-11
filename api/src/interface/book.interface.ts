@@ -1,3 +1,4 @@
+import { Book } from "../entities/book.model";
 import { User } from "../entities/user.model";
 
 export interface IBook {
@@ -11,4 +12,5 @@ export interface IEditBook {
     title?: string;
     publisher?: string;
     author?: User
+    book?: Book
 }

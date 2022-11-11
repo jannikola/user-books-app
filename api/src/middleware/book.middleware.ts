@@ -65,6 +65,8 @@ export const can = (permission: EPermission) => {
 
             const permissions = await RolePermissionHelper.getPermissionsArrayForRole(roleUser.role);
             const havePermission = permissions.includes(permission);
+            const isSameUser = book.author.id === roleUser.id;
+            console.log({ havePermission })
 
             switch (permission) {
                 case EPermission.ADD_BOOKS:
@@ -74,15 +76,18 @@ export const can = (permission: EPermission) => {
                     break;
 
                 case EPermission.EDIT_BOOKS:
-                    if (!havePermission && book.author.id !== roleUser.id) {
+                    if ((!havePermission && !isSameUser) || body.authorId) {
                         throw new Error("Forbidden");
                     }
+
                     body.book = book;
-                    body.author = await UserService.getById(body.authorId);
+                    if (body.authorId) {
+                        body.author = await UserService.getById(body.authorId);
+                    }
                     break;
 
                 case EPermission.REMOVE_BOOKS:
-                    if (!havePermission && book.author.id !== roleUser.id) {
+                    if (!havePermission && !isSameUser) {
                         throw new Error("Forbidden");
                     }
                     break;
