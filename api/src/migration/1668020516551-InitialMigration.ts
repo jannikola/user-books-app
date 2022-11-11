@@ -15,8 +15,8 @@ export class InitialMigration1668020516551 implements MigrationInterface {
         roleId: "roleId",
         email: "email",
         password: "password",
-        firstName: "firstName",
-        lastName: "lastName",
+        firstName: "first_name",
+        lastName: "last_name",
         deactivatedAt: "deactivated_at",
         type: "type",
         permissionId: "permissionId",
@@ -54,6 +54,7 @@ export class InitialMigration1668020516551 implements MigrationInterface {
                         name: this.column.email,
                         type: ColumnType.VARCHAR,
                         isNullable: false,
+                        isUnique: true,
                     },
                     {
                         name: this.column.password,

@@ -5,7 +5,7 @@ import { RolePermission } from "./rolePermission.model";
 @Entity("permission")
 export class Permission extends BaseModel {
     @OneToMany(
-        (type) => RolePermission,
+        () => RolePermission,
         (rolePermission) => rolePermission.permission
     )
     rolePermissions: RolePermission[];

@@ -6,7 +6,7 @@ import { Role } from "./role.model";
 @Entity("user")
 export class User extends BaseModel {
     @ManyToOne(() => Role, (role) => role.users)
-    role: User;
+    role: Role;
 
     @OneToMany(() => Book, (book) => book.author)
     books: Book[];
