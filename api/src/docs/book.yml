@@ -1,0 +1,92 @@
+openapi: "3.1.0"
+servers:
+  - url: https://localhost:3000/v1/
+paths:
+  /book:
+    post:
+      tags:
+        - "BOOK"
+      summary: "Create book"
+      description: "Create book"
+      operationId: "createBook"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            properties:
+              authorId:
+                type: "number"
+                required: false
+              title:
+                type: "string"
+              publisher:
+      responses:
+        201:
+          description: "Successful"
+        400:
+          description: "Something went wrong"
+        403:
+          description: "Forbidden"
+  /book/{id}:
+    put:
+      tags:
+        - "BOOK"
+      summary: "Edit book"
+      description: "Edit book"
+      operationId: "editBook"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Book ID"
+          required: true
+          type: "number"
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            properties:
+              authorId:
+                type: "number"
+                required: false
+              title:
+                type: "string"
+              publisher:
+    responses:
+        200:
+          description: "Successful"
+        400:
+          description: "Something went wrong"
+        403:
+          description: "Forbidden"
+    delete:
+      tags:
+        - "BOOK"
+      summary: "Delete book"
+      description: "Delete book by id"
+      operationId: "deleteBook"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Book ID"
+          required: true
+          type: "number"
+      responses:
+        200:
+          description: "Successful"
+        400:
+          description: "Something went wrong"
+        403:
+          description: "Forbidden"

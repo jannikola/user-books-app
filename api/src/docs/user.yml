@@ -1,0 +1,147 @@
+openapi: "3.1.0"
+servers:
+  - url: https://localhost:3000/v1/
+paths:
+  /user/login:
+    post:
+      tags:
+        - "USER"
+      summary: "Login"
+      description: "Login route"
+      operationId: "login"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            properties:
+              email:
+                type: "string"
+                example: "example@email.com"
+              password:
+                type: "string"
+                example: "xxxxxxx"
+
+      responses:
+        200:
+          description: "Successful login"
+        400:
+          description: "Incorrect Credentials"
+
+  /user/author:
+    post:
+      tags:
+        - "USER"
+      summary: "Create author"
+      description: "Create author user"
+      operationId: "createAuthor"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            properties:
+              email:
+                type: "string"
+              password:
+                type: "string"
+              firstName:
+                type: "string"
+              lastName:
+                type: "string"
+      responses:
+        201:
+          description: "Successful"
+        400:
+          description: "Something went wrong || User with this email already exist."
+        403:
+          description: "Forbidden"
+  /user/{id}:
+    put:
+      tags:
+        - "USER"
+      summary: "Edit user"
+      description: "Edit user"
+      operationId: "editUser"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "User ID"
+          required: true
+          type: "number"
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            properties:
+              password:
+                type: "string"
+              firstName:
+                type: "string"
+              lastName:
+                type: "string"
+    responses:
+        200:
+          description: "Successful"
+        400:
+          description: "Something went wrong"
+        403:
+          description: "Forbidden"
+    patch:
+      tags:
+        - "USER"
+      summary: "Deactivate user"
+      description: "Deactivate user by id"
+      operationId: "deactivateUser"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "User ID"
+          required: true
+          type: "number"
+      responses:
+        200:
+          description: "Successful"
+        400:
+          description: "Something went wrong"
+        403:
+          description: "Forbidden"
+    delete:
+      tags:
+        - "USER"
+      summary: "Delete user"
+      description: "Delete user by id"
+      operationId: "deleteUser"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "User ID"
+          required: true
+          type: "number"
+      responses:
+        200:
+          description: "Successful"
+        400:
+          description: "Something went wrong"
+        403:
+          description: "Forbidden"
