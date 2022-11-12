@@ -3,7 +3,6 @@ import { UserService } from "../../../services/user";
 import { ResponseBuilder } from "../../../utilities/response";
 import {
     can,
-    canAdd,
     userExist,
     validateCreate,
     validateEdit,
@@ -49,9 +48,9 @@ export class UserRoutes {
 
         this.router.post(
             "/user/author",
-            canAdd,
             validateCreate,
             userExist,
+            can(EPermission.ADD_ALL_USERS),
             async (req: Request, res: Response) => {
                 try {
                     const body = req.body;
@@ -81,8 +80,8 @@ export class UserRoutes {
 
         this.router.put(
             "/user/:id",
-            can(EPermission.EDIT_ALL_USERS),
             validateEdit,
+            can(EPermission.EDIT_ALL_USERS),
             async (req: Request, res: Response) => {
                 try {
                     const body = req.body;

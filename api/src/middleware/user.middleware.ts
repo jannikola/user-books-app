@@ -52,12 +52,7 @@ export const validateEdit = async (
 ) => {
     try {
         const body = req.body;
-        const user = body.user;
-        delete body.user;
-
         await Validator.edit(body);
-
-        body.user = user;
         next();
     } catch (e) {
         return new ResponseBuilder<Error>()
@@ -93,33 +88,6 @@ export const userExist = async (
     }
 };
 
-export const canAdd = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try {
-        const authorization = req.headers.authorization;
-        const requestUser = JwtToken.getRequestUser(authorization);
-        const user = await UserService.getById(requestUser.id);
-
-        const permissions = await RolePermissionHelper.getPermissionsArrayForRole(user.role);
-
-        if (!permissions.includes(EPermission.ADD_ALL_USERS)) {
-            throw new Error("Forbidden");
-        }
-
-        next();
-    } catch (e) {
-        return new ResponseBuilder<Error>()
-            .setData(e.message)
-            .setStatus(false)
-            .setResponse(res)
-            .setResponseStatus(403)
-            .build();
-    }
-};
-
 export const can = (permission: EPermission) => {
     return async (
         req: Request,
@@ -130,28 +98,48 @@ export const can = (permission: EPermission) => {
             const id = Number(req.params.id);
             const authorization = req.headers.authorization;
             const requestUser = JwtToken.getRequestUser(authorization);
-
-            const usersToCheck = await RolePermissionHelper.getRoleAndTargetUsers(requestUser.id, id);
-            const { roleUser, targetUser } = usersToCheck;
+            const roleUser = await UserService.getById(requestUser.id);
 
             const permissions = await RolePermissionHelper.getPermissionsArrayForRole(roleUser.role);
+            const havePermission = permissions.includes(permission);
+            let isSameUser = null;
+            let targetUser = null;
+            let isOtherAdminActive = null;
+            let isAdmin = null;
 
-            const isSameUser = roleUser.id === targetUser.id;
-
-            if (permission === EPermission.REMOVE_ALL_USERS) {
-                if (isSameUser) {
-                    throw new Error("Forbidden");
-                }
-
-                const isOtherAdminActive = targetUser.role.type === ERole.ADMIN && !targetUser.deactivatedAt;
-
-                if (!isSameUser && isOtherAdminActive) {
-                    throw new Error("Forbidden");
-                }
+            if (id) {
+                targetUser = await UserService.getById(id);
+                isAdmin = targetUser?.role?.type === ERole.ADMIN;
+                isOtherAdminActive = isAdmin && !targetUser?.deactivatedAt;
+                isSameUser = roleUser.id === targetUser?.id;
             }
 
-            if (!permissions.includes(permission) && !isSameUser) {
-                throw new Error("Forbidden");
+            switch (permission) {
+                case EPermission.REMOVE_ALL_USERS:
+                    if (isSameUser || isOtherAdminActive || !havePermission) {
+                        throw new Error("Forbidden");
+                    }
+                    break;
+
+                case EPermission.DEACTIVATE_ALL_USERS:
+                    if ((isAdmin && !isSameUser) || (!havePermission && !isSameUser)) {
+                        throw new Error("Forbidden");
+                    }
+
+                    break;
+
+                case EPermission.EDIT_ALL_USERS:
+                    if (!havePermission && !isSameUser) {
+                        throw new Error("Forbidden");
+                    }
+
+                    break;
+
+                default:
+                    if (!havePermission) {
+                        throw new Error("Forbidden");
+                    }
+                    break;
             }
 
             req.body.user = targetUser;
