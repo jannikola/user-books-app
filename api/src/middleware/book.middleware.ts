@@ -58,15 +58,16 @@ export const can = (permission: EPermission) => {
             const authorization = req.headers.authorization;
             const requestUser = JwtToken.getRequestUser(authorization);
 
-            const [roleUser, book,] = await Promise.all([
-                UserService.getById(requestUser.id),
-                BookService.getById(id),
-            ]);
+            const roleUser = await UserService.getById(requestUser.id);
+            let book = null;
+
+            if (id) {
+                book = await BookService.getById(id);
+            }
 
             const permissions = await RolePermissionHelper.getPermissionsArrayForRole(roleUser.role);
             const havePermission = permissions.includes(permission);
-            const isSameUser = book.author.id === roleUser.id;
-            console.log({ havePermission })
+            const isSameUser = book?.author?.id === roleUser.id;
 
             switch (permission) {
                 case EPermission.ADD_BOOKS:
