@@ -122,7 +122,7 @@ export const can = (permission: EPermission) => {
                     break;
 
                 case EPermission.DEACTIVATE_USERS:
-                    if ((isAdmin && !isSameUser) || (!havePermission && !isSameUser)) {
+                    if (!isSameUser) {
                         throw new Error("Forbidden");
                     }
 
