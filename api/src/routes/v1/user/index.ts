@@ -50,7 +50,7 @@ export class UserRoutes {
             "/user/author",
             validateCreate,
             userExist,
-            can(EPermission.ADD_ALL_USERS),
+            can(EPermission.ADD_USERS),
             async (req: Request, res: Response) => {
                 try {
                     const body = req.body;
@@ -81,7 +81,7 @@ export class UserRoutes {
         this.router.put(
             "/user/:id",
             validateEdit,
-            can(EPermission.EDIT_ALL_USERS),
+            can(EPermission.EDIT_USERS),
             async (req: Request, res: Response) => {
                 try {
                     const body = req.body;
@@ -113,7 +113,7 @@ export class UserRoutes {
 
         this.router.patch(
             "/user/deactivate/:id",
-            can(EPermission.DEACTIVATE_ALL_USERS),
+            can(EPermission.DEACTIVATE_USERS),
             async (req: Request, res: Response) => {
                 try {
                     const body = req.body;
@@ -142,7 +142,7 @@ export class UserRoutes {
 
         this.router.delete(
             "/user/delete/:id",
-            can(EPermission.REMOVE_ALL_USERS),
+            can(EPermission.REMOVE_USERS),
             async (req: Request, res: Response) => {
                 try {
                     const body = req.body;

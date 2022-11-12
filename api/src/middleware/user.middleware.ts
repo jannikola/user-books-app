@@ -115,20 +115,20 @@ export const can = (permission: EPermission) => {
             }
 
             switch (permission) {
-                case EPermission.REMOVE_ALL_USERS:
+                case EPermission.REMOVE_USERS:
                     if (isSameUser || isOtherAdminActive || !havePermission) {
                         throw new Error("Forbidden");
                     }
                     break;
 
-                case EPermission.DEACTIVATE_ALL_USERS:
+                case EPermission.DEACTIVATE_USERS:
                     if ((isAdmin && !isSameUser) || (!havePermission && !isSameUser)) {
                         throw new Error("Forbidden");
                     }
 
                     break;
 
-                case EPermission.EDIT_ALL_USERS:
+                case EPermission.EDIT_USERS:
                     if (!havePermission && !isSameUser) {
                         throw new Error("Forbidden");
                     }
