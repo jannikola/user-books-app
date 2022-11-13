@@ -34,6 +34,7 @@ export class BookRepository {
         try {
             return await this.getBaseQuery()
                 .leftJoinAndSelect("b.author", "author")
+                .leftJoinAndSelect("author.role", "role")
                 .where("b.id = :id", { id })
                 .getOne();
         } catch (e) {
