@@ -57,7 +57,6 @@ export const can = (permission: EPermission) => {
             const body = req.body;
             const authorization = req.headers.authorization;
             const requestUser = JwtToken.getRequestUser(authorization);
-
             const roleUser = await UserService.getById(requestUser.id);
             let book = null;
 
