@@ -53,13 +53,13 @@ export class UserService {
         const user = await this.getByEmail(email);
 
         if (!user) {
-            throw new Error("User not found.")
+            throw new Error("User not found.");
         }
 
         const passwordMatch = await Crypt.compare(password, user.password);
 
         if (!passwordMatch) {
-            throw new Error("Invalid creds.")
+            throw new Error("Invalid creds.");
         }
 
         return JwtToken.signToken({

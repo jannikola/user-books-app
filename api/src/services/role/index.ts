@@ -3,7 +3,7 @@ import { ERole } from "../../enum/role.enum";
 
 export class RoleService {
     static async getByType(type: ERole | string) {
-        const result = await RoleRepository.getByType(type)
+        const result = await RoleRepository.getByType(type);
 
         if (!result) {
             throw new Error("Role not found");

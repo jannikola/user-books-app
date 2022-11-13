@@ -76,7 +76,7 @@ export const can = (permission: EPermission) => {
                     break;
 
                 case EPermission.EDIT_BOOKS:
-                    if ((!havePermission && !isSameUser) || body.authorId) {
+                    if (!havePermission && !isSameUser) {
                         throw new Error("Forbidden");
                     }
 
