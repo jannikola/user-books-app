@@ -98,7 +98,7 @@ export const can = (permission: EPermission) => {
         try {
             const id = Number(req.params.id);
             const body = req.body;
-            const roleId = body?.roleId;
+            const roleId = Number(body?.roleId);
             const authorization = req.headers.authorization;
             const requestUser = JwtToken.getRequestUser(authorization);
             const roleUser = await UserService.getById(requestUser.id);
