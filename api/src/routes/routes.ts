@@ -3,6 +3,7 @@ import { expressjwt } from "express-jwt";
 import { Request, Response, NextFunction } from "express";
 import { UserRoutes } from "./v1/user";
 import { BookRoutes } from "./v1/book";
+import docs from './v1/docs';
 
 export async function apiRoutes(
     app: express.Application
@@ -19,6 +20,8 @@ export async function apiRoutes(
         );
         next();
     });
+
+    app.use('/api/v1', docs);
 
     app.use(
         expressjwt({
