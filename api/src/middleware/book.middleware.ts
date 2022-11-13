@@ -6,6 +6,7 @@ import { ResponseBuilder } from "../utilities/response";
 import { Validator } from "../utilities/validation/book";
 import { UserService } from "../services/user";
 import { BookService } from "../services/book";
+import { ERole } from "../enum/role.enum";
 
 
 export const validateCreate = async (
@@ -55,6 +56,7 @@ export const can = (permission: EPermission) => {
         try {
             const id = Number(req.params.id);
             const body = req.body;
+            const authorId = body?.authorId;
             const authorization = req.headers.authorization;
             const requestUser = JwtToken.getRequestUser(authorization);
             const roleUser = await UserService.getById(requestUser.id);
@@ -66,28 +68,30 @@ export const can = (permission: EPermission) => {
 
             const permissions = await RolePermissionHelper.getPermissionsArrayForRole(roleUser.role);
             const havePermission = permissions.includes(permission);
+            const isAuthorAdmin = book?.author?.role?.type === ERole.ADMIN;
             const isSameUser = book?.author?.id === roleUser.id;
+            const isSameAuthor = book?.author?.id === roleUser.id;
 
             switch (permission) {
                 case EPermission.ADD_BOOKS:
-                    if (!havePermission && body.authorId) {
+                    if ((!havePermission && authorId) || (isAuthorAdmin && !isSameAuthor)) {
                         throw new Error("Forbidden");
                     }
                     break;
 
                 case EPermission.EDIT_BOOKS:
-                    if (!havePermission && !isSameUser) {
+                    if ((!havePermission && !isSameUser) || (!havePermission && authorId) || (isAuthorAdmin && !isSameAuthor)) {
                         throw new Error("Forbidden");
                     }
 
                     body.book = book;
-                    if (body.authorId) {
-                        body.author = await UserService.getById(body.authorId);
+                    if (authorId) {
+                        body.author = await UserService.getById(authorId);
                     }
                     break;
 
                 case EPermission.REMOVE_BOOKS:
-                    if (!havePermission && !isSameUser) {
+                    if ((!havePermission && !isSameUser) || (isAuthorAdmin && !isSameAuthor)) {
                         throw new Error("Forbidden");
                     }
                     break;
