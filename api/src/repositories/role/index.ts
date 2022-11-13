@@ -35,4 +35,14 @@ export class RoleRepository {
             throw new Error(e);
         }
     }
+
+    static async getById(id: number): Promise<Role> {
+        try {
+            return await this.getBaseQuery()
+                .where("r.id = :id", { id })
+                .getOne();
+        } catch (e) {
+            throw new Error(e);
+        }
+    }
 }

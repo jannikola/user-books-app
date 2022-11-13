@@ -30,6 +30,7 @@ export class Schema {
                 password: Joi.string(),
                 firstName: Joi.string(),
                 lastName: Joi.string(),
+                roleId: Joi.number(),
             });
         } catch (e) {
             throw new Error(e);

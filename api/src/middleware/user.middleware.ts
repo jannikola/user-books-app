@@ -6,6 +6,7 @@ import { Validator } from "../utilities/validation/user";
 import { EPermission } from "../enum/permission.enum";
 import { RolePermissionHelper } from "../utilities/permission";
 import { ERole } from "../enum/role.enum";
+import { RoleService } from "../services/role";
 
 export const validateLogin = async (
     req: Request,
@@ -96,6 +97,8 @@ export const can = (permission: EPermission) => {
     ) => {
         try {
             const id = Number(req.params.id);
+            const body = req.body;
+            const roleId = Number(body?.roleId);
             const authorization = req.headers.authorization;
             const requestUser = JwtToken.getRequestUser(authorization);
             const roleUser = await UserService.getById(requestUser.id);
@@ -129,8 +132,13 @@ export const can = (permission: EPermission) => {
                     break;
 
                 case EPermission.EDIT_USERS:
-                    if (!havePermission && !isSameUser) {
+                    if ((!havePermission && !isSameUser) || (!havePermission && roleId) || (isAdmin && !isSameUser)) {
                         throw new Error("Forbidden");
+                    }
+
+                    if (roleId) {
+                        const role = await RoleService.getById(roleId);
+                        body.role = role;
                     }
 
                     break;
@@ -142,7 +150,7 @@ export const can = (permission: EPermission) => {
                     break;
             }
 
-            req.body.user = targetUser;
+            body.user = targetUser;
 
             next();
         } catch (e) {

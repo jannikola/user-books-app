@@ -97,6 +97,9 @@ paths:
               lastName:
                 type: "string"
                 required: false
+              roleId:
+                type: "number"
+                required: false
     responses:
         200:
           description: "Successful"
